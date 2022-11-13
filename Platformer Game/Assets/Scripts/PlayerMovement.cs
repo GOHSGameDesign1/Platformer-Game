@@ -75,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
     {
         //Fixed update runs in sync with Unity's physics engine
 
-        //Get Kit's current ground status from her ground script
+        //Get current ground status from ground script
         onGround = ground.GetOnGround();
 
         //Get the Rigidbody's current velocity
