@@ -43,7 +43,8 @@ public class PlayerJump : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        Debug.Log(context);
+        if (context.started)
         {
             desiredJump = true;
         }
@@ -158,17 +159,19 @@ public class PlayerJump : MonoBehaviour
             velocity.y += jumpSpeed;
             currentlyJumping = true;
         }
+
+        desiredJump = false;
     }
 
     private void OnEnable()
     {
         playerActions.Player.Enable();
-        playerActions.Player.Jump.performed += OnJump;
+        playerActions.Player.Jump.started += OnJump;
     }
 
     private void OnDisable()
     {
-        playerActions.Player.Jump.performed -= OnJump;
+        playerActions.Player.Jump.started -= OnJump;
         playerActions.Player.Disable();
     }
 }

@@ -16,6 +16,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to reach max speed")] public float maxAcceleration = 52f;
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop after letting go")] public float maxDecceleration = 52f;
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop when changing direction")] public float maxTurnSpeed = 80f;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to reach max speed when in mid-air")] public float maxAirAcceleration;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop in mid-air when no direction is used")] public float maxAirDeceleration;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop when changing direction when in mid-air")] public float maxAirTurnSpeed = 80f;
 
     [Header("Calculations")]
     public float directionX;
@@ -86,10 +89,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
-        //Set acceleration, deceleration, and turnspeed stats
-        acceleration = maxAcceleration;
-        deceleration = maxDecceleration;
-        turnSpeed = maxTurnSpeed;
+        //Set acceleration, deceleration, and turnspeed stats based on whether in-air or not
+        acceleration = onGround ? maxAcceleration : maxAirAcceleration;
+        deceleration = onGround ? maxDecceleration : maxAirDeceleration;
+        turnSpeed = onGround ? maxTurnSpeed : maxAirTurnSpeed;
 
         if (pressingKey)
         {
