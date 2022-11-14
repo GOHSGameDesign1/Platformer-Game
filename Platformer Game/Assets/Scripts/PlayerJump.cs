@@ -20,6 +20,7 @@ public class PlayerJump : MonoBehaviour
 
     [Header("Options")]
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimit;
+    [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
 
     [Header("Calculations")]
     public Vector2 velocity;
@@ -29,6 +30,7 @@ public class PlayerJump : MonoBehaviour
 
     [Header("Current State")]
     private bool desiredJump;
+    [SerializeField] private float inputGliding;
     public bool onGround;
     private bool currentlyJumping;
 
@@ -50,6 +52,11 @@ public class PlayerJump : MonoBehaviour
         }
     }
 
+    public void OnGlide(InputAction.CallbackContext context)
+    {
+
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -57,6 +64,8 @@ public class PlayerJump : MonoBehaviour
 
         //Get current ground status from ground script
         onGround = ground.GetOnGround();
+
+        inputGliding = playerActions.Player.Glide.ReadValue<float>();
     }
 
     private void SetPhysics()
@@ -113,6 +122,18 @@ public class PlayerJump : MonoBehaviour
             }
             else
             {
+                // if falling and inputting a glide clamp the velocity to -3
+                if (inputGliding != 0) 
+                { 
+                    rb.velocity = new Vector2(velocity.x, Mathf.Clamp(rb.velocity.y, glideSpeedLimit, 100));
+
+                    gravMultiplier = downwardMovementMultiplier;
+
+                    //Return to ignore the other clamp down below
+                    return;
+                }
+                
+
                 //Otherwise, apply the downward gravity multiplier as Kit comes back to Earth
                 gravMultiplier = downwardMovementMultiplier;
             }
@@ -129,7 +150,6 @@ public class PlayerJump : MonoBehaviour
 
             gravMultiplier = defaultGravityScale;
         }
-
         //Set the character's Rigidbody's velocity
         //But clamp the Y variable within the bounds of the speed limit, for the terminal velocity assist option
         rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit, 100));
@@ -167,6 +187,7 @@ public class PlayerJump : MonoBehaviour
     {
         playerActions.Player.Enable();
         playerActions.Player.Jump.started += OnJump;
+        playerActions.Player.Glide.performed += OnGlide;
     }
 
     private void OnDisable()

@@ -161,7 +161,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: -5.74
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -330,9 +330,11 @@ MonoBehaviour:
   downwardMovementMultiplier: 1.46
   maxAirJumps: 0
   speedLimit: 10
+  glideSpeedLimit: 1
   velocity: {x: 0, y: 0}
   jumpSpeed: 0
   gravMultiplier: 1
+  inputGliding: 0
   onGround: 0
 --- !u!1 &519420028
 GameObject:
