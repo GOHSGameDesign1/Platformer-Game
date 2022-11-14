@@ -30,7 +30,7 @@ public class PlayerJump : MonoBehaviour
 
     [Header("Current State")]
     private bool desiredJump;
-    [SerializeField] private float inputGliding;
+    [SerializeField] public float inputGliding;
     public bool onGround;
     private bool currentlyJumping;
 
