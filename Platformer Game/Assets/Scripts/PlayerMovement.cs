@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (directionX != 0)
         {
-            transform.localScale = new Vector3(directionX > 0 ? 1 : -1, 1, 1);
+            //transform.localScale = new Vector3(directionX > 0 ? 1 : -1, 1, 1);
             pressingKey = true;
         }
         else

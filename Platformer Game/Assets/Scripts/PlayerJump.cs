@@ -124,7 +124,8 @@ public class PlayerJump : MonoBehaviour
             {
                 // if falling and inputting a glide clamp the velocity to -3
                 if (inputGliding != 0) 
-                { 
+                {
+                    Debug.Log("gliding");
                     rb.velocity = new Vector2(velocity.x, Mathf.Clamp(rb.velocity.y, glideSpeedLimit, 100));
 
                     gravMultiplier = downwardMovementMultiplier;
