@@ -119,7 +119,7 @@ public class PlayerJump : MonoBehaviour
             {
                 if(current.GetComponent<AirCurrent>().velocity.y < 0)
                 {
-                    rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, speedLimit + 3));
+                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, speedLimit + 3));
                     downCurrents++;
                     //glideSpeedLimit = -4;
                 }
@@ -138,7 +138,7 @@ public class PlayerJump : MonoBehaviour
                 rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
             }
 
-            rb.velocity = new Vector3(velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 3, speedLimit + 3));
+            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 3, speedLimit + 3));
 
             return;
         }
