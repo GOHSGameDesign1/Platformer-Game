@@ -20,30 +20,39 @@ public class PlayerJump : MonoBehaviour
 
     [Header("Options")]
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimit;
+    [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
+    [SerializeField] public float glideDragVelocity;
+    [SerializeField] public float glideDragRampSpeed;
+    [SerializeField] public float glideDragForce;
 
     [Header("Calculations")]
     public Vector2 velocity;
     public float jumpSpeed;
     private float defaultGravityScale;
     public float gravMultiplier;
+    private float refVelocity = 1;
 
     [Header("Current State")]
     private bool desiredJump;
+    [SerializeField] public float inputGliding;
     public bool onGround;
-    private bool currentlyJumping;
+    [SerializeField] private bool currentlyJumping;
+    [SerializeField] private bool gliding;
+    [field:SerializeField] public HashSet<GameObject> airCurrentsAffecting { get; private set; }
 
     void Awake()
     {
-        // finds components and makes a new instance of input
+        // finds components, set variables, and makes a new instance of input
         ground = GetComponent<characterGround>();
         rb = GetComponent<Rigidbody2D>();
         playerActions = new PlayerInputActions();
+        airCurrentsAffecting= new HashSet<GameObject>();
         defaultGravityScale = 1f;
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
         {
             desiredJump = true;
         }
@@ -56,6 +65,8 @@ public class PlayerJump : MonoBehaviour
 
         //Get current ground status from ground script
         onGround = ground.GetOnGround();
+
+        inputGliding = playerActions.Player.Glide.ReadValue<float>();
     }
 
     private void SetPhysics()
@@ -69,6 +80,14 @@ public class PlayerJump : MonoBehaviour
     {
         //Get velocity from Rigidbody 
         velocity = rb.velocity;
+
+        if(!onGround && !currentlyJumping && (inputGliding != 0)) 
+        { 
+            gliding = true;
+        } else
+        {
+            gliding = false;
+        }
 
         if (desiredJump)
         {
@@ -87,6 +106,43 @@ public class PlayerJump : MonoBehaviour
     {
         //We change the character's gravity based on her Y direction
 
+        if(gliding)
+        {
+             //rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, glideSpeedLimit, 10));
+
+            //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
+
+            gravMultiplier = 0.7f;
+            int downCurrents = 0;
+
+            foreach(GameObject current in airCurrentsAffecting)
+            {
+                if(current.GetComponent<AirCurrent>().velocity.y < 0)
+                {
+                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, speedLimit + 3));
+                    downCurrents++;
+                    //glideSpeedLimit = -4;
+                }
+
+                rb.velocity += (Vector2)current.GetComponent<AirCurrent>().velocity;
+            }
+
+            if(rb.velocity.y < glideSpeedLimit && (downCurrents == 0))
+            {
+                //rb.velocity = new Vector3(velocity.x, Mathf.SmoothDamp(velocity.y, glideSpeedLimit, ref refVelocity, Time.fixedDeltaTime));
+                //rb.velocity += new Vector2(0, Mathf.Lerp(0, Mathf.Abs(rb.velocity.y), 1));
+                //rb.AddForce(new Vector2(0, rb.gravityScale + glideDragForce));
+
+                //rb.velocity = new Vector2(velocity.x, Mathf.MoveTowards(rb.velocity.y, 0, (15 * Mathf.Abs(rb.velocity.y)) * Time.deltaTime)); GOOD
+
+                rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
+            }
+
+            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 3, speedLimit + 3));
+
+            return;
+        }
+
         //If player is going up...
         if (rb.velocity.y > 0.01f)
         {
@@ -97,13 +153,14 @@ public class PlayerJump : MonoBehaviour
             }
             else
             {
-                gravMultiplier = upwardMovementMultiplier;
+                gravMultiplier = upwardMovementMultiplier; //If still jumping, have normal jumping gravity
             }
         }
 
         //Else if going down...
         else if (rb.velocity.y < -0.01f)
         {
+            if(currentlyJumping) { currentlyJumping= false; }
 
             if (onGround)
             //Don't change it if Kit is stood on something (such as a moving platform)
@@ -112,6 +169,19 @@ public class PlayerJump : MonoBehaviour
             }
             else
             {
+                /*// if falling and inputting a glide clamp the velocity to -3
+                if (gliding) 
+                {
+                    Debug.Log("gliding");
+                    rb.velocity = new Vector2(velocity.x, Mathf.Clamp(rb.velocity.y, glideSpeedLimit, 100));
+
+                    gravMultiplier = 0.1f;
+
+                    //Return to ignore the other clamp down below
+                    return;
+                }*/
+                
+
                 //Otherwise, apply the downward gravity multiplier as Kit comes back to Earth
                 gravMultiplier = downwardMovementMultiplier;
             }
@@ -128,7 +198,6 @@ public class PlayerJump : MonoBehaviour
 
             gravMultiplier = defaultGravityScale;
         }
-
         //Set the character's Rigidbody's velocity
         //But clamp the Y variable within the bounds of the speed limit, for the terminal velocity assist option
         rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit, 100));
@@ -158,17 +227,39 @@ public class PlayerJump : MonoBehaviour
             velocity.y += jumpSpeed;
             currentlyJumping = true;
         }
+
+        desiredJump = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("triggered");
+
+        airCurrentsAffecting.Add(collision.gameObject);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject != null)
+        {
+            airCurrentsAffecting.Remove(collision.gameObject);
+        }
     }
 
     private void OnEnable()
     {
         playerActions.Player.Enable();
-        playerActions.Player.Jump.performed += OnJump;
+        playerActions.Player.Jump.started += OnJump;
     }
 
     private void OnDisable()
     {
-        playerActions.Player.Jump.performed -= OnJump;
+        playerActions.Player.Jump.started -= OnJump;
         playerActions.Player.Disable();
+    }
+
+    public bool getGliding()
+    {
+        return gliding;
     }
 }

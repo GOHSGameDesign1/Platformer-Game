@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Components")]
     characterGround ground;
     Rigidbody2D rb;
+    PlayerJump playerJump;
 
     PlayerInputActions playerActions;
 
@@ -16,6 +17,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to reach max speed")] public float maxAcceleration = 52f;
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop after letting go")] public float maxDecceleration = 52f;
     [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop when changing direction")] public float maxTurnSpeed = 80f;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to reach max speed when in mid-air")] public float maxAirAcceleration;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop in mid-air when no direction is used")] public float maxAirDeceleration;
+    [SerializeField, Range(0f, 100f)][Tooltip("How fast to stop when changing direction when in mid-air")] public float maxAirTurnSpeed = 80f;
 
     [Header("Calculations")]
     public float directionX;
@@ -29,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Current State")]
     public bool onGround;
     public bool pressingKey;
+    private HashSet<GameObject> currentAirCurrents;
 
 
     // Start is called before the first frame update
@@ -37,7 +42,13 @@ public class PlayerMovement : MonoBehaviour
         // finds components and makes a new instance of input
         ground = GetComponent<characterGround>();
         rb = GetComponent<Rigidbody2D>();
+        playerJump= GetComponent<PlayerJump>();
         playerActions = new PlayerInputActions();
+    }
+
+    private void Start()
+    {
+        currentAirCurrents = playerJump.airCurrentsAffecting;
     }
 
     public void OnHorizontal(InputAction.CallbackContext context)
@@ -58,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (directionX != 0)
         {
-            transform.localScale = new Vector3(directionX > 0 ? 1 : -1, 1, 1);
+            //transform.localScale = new Vector3(directionX > 0 ? 1 : -1, 1, 1);
             pressingKey = true;
         }
         else
@@ -86,10 +97,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Run()
     {
-        //Set acceleration, deceleration, and turnspeed stats
-        acceleration = maxAcceleration;
-        deceleration = maxDecceleration;
-        turnSpeed = maxTurnSpeed;
+        //Set acceleration, deceleration, and turnspeed stats based on whether in-air or not
+        acceleration = onGround ? maxAcceleration : maxAirAcceleration;
+        deceleration = onGround ? maxDecceleration : maxAirDeceleration;
+        turnSpeed = onGround ? maxTurnSpeed : maxAirTurnSpeed;
 
         if (pressingKey)
         {
@@ -112,6 +123,11 @@ public class PlayerMovement : MonoBehaviour
 
         //Move our velocity towards the desired velocity, at the rate of the number calculated above
         velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+
+        foreach(GameObject current in currentAirCurrents)
+        {
+            //velocity.x += transform.up.x;
+        }
 
         //Update the Rigidbody with this new velocity
         rb.velocity = velocity;
