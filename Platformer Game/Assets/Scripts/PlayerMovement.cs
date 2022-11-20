@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Components")]
     characterGround ground;
     Rigidbody2D rb;
+    PlayerJump playerJump;
 
     PlayerInputActions playerActions;
 
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Current State")]
     public bool onGround;
     public bool pressingKey;
+    private HashSet<GameObject> currentAirCurrents;
 
 
     // Start is called before the first frame update
@@ -40,7 +42,13 @@ public class PlayerMovement : MonoBehaviour
         // finds components and makes a new instance of input
         ground = GetComponent<characterGround>();
         rb = GetComponent<Rigidbody2D>();
+        playerJump= GetComponent<PlayerJump>();
         playerActions = new PlayerInputActions();
+    }
+
+    private void Start()
+    {
+        currentAirCurrents = playerJump.airCurrentsAffecting;
     }
 
     public void OnHorizontal(InputAction.CallbackContext context)
@@ -115,6 +123,11 @@ public class PlayerMovement : MonoBehaviour
 
         //Move our velocity towards the desired velocity, at the rate of the number calculated above
         velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+
+        foreach(GameObject current in currentAirCurrents)
+        {
+            //velocity.x += transform.up.x;
+        }
 
         //Update the Rigidbody with this new velocity
         rb.velocity = velocity;
