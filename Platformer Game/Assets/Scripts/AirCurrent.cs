@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class AirCurrent : MonoBehaviour
@@ -9,7 +11,7 @@ public class AirCurrent : MonoBehaviour
     public float upwardForce;
     [SerializeField] private bool playerInside;
 
-    [field: SerializeField] public Vector2 velocity { get; private set; }
+    [field: SerializeField] public Vector3 velocity;
     // Start is called before the first frame update
     void Start()
     {
@@ -54,7 +56,7 @@ public class AirCurrent : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawLine(transform.position, velocity + (Vector2)transform.position);
+        Gizmos.DrawLine(transform.position, velocity + transform.position);
     }
 
     /*private void OnTriggerStay2D(Collider2D collision)
@@ -66,3 +68,29 @@ public class AirCurrent : MonoBehaviour
         }
     }*/
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(AirCurrent))]
+[CanEditMultipleObjects]
+public class AirCurrentEditor : Editor
+{
+    public void OnSceneGUI()
+    {
+        var linkedObject = target as AirCurrent;
+
+        Handles.color = Color.yellow;
+
+        Handles.DrawLine(linkedObject.transform.position, linkedObject.velocity + linkedObject.transform.position);
+        
+        EditorGUI.BeginChangeCheck();
+
+        Vector3 newVelocity = Handles.PositionHandle(linkedObject.velocity + linkedObject.transform.position, Quaternion.identity);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Update position");
+            linkedObject.velocity = newVelocity - linkedObject.transform.position;
+        }
+    }
+}
+#endif //UNITY_EDITOR

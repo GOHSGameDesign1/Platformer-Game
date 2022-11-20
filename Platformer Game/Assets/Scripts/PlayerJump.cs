@@ -21,12 +21,16 @@ public class PlayerJump : MonoBehaviour
     [Header("Options")]
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimit;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
+    [SerializeField] public float glideDragVelocity;
+    [SerializeField] public float glideDragRampSpeed;
+    [SerializeField] public float glideDragForce;
 
     [Header("Calculations")]
     public Vector2 velocity;
     public float jumpSpeed;
     private float defaultGravityScale;
     public float gravMultiplier;
+    private float refVelocity = 1;
 
     [Header("Current State")]
     private bool desiredJump;
@@ -104,19 +108,34 @@ public class PlayerJump : MonoBehaviour
 
         if(gliding)
         {
-             rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, glideSpeedLimit, 10));
+             //rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, glideSpeedLimit, 10));
+
             //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
 
             gravMultiplier = 0.5f;
+            int downCurrents = 0;
 
             foreach(GameObject current in airCurrentsAffecting)
             {
-                if(current.transform.up.y < 0)
+                if(current.GetComponent<AirCurrent>().velocity.y < 0)
                 {
-                    rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit, 10));
+                    rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, 100));
+                    downCurrents++;
+                    //glideSpeedLimit = -4;
                 }
 
                 rb.velocity += (Vector2)current.GetComponent<AirCurrent>().velocity;
+            }
+
+            if(rb.velocity.y < glideSpeedLimit && (downCurrents == 0))
+            {
+                //rb.velocity = new Vector3(velocity.x, Mathf.SmoothDamp(velocity.y, glideSpeedLimit, ref refVelocity, Time.fixedDeltaTime));
+                //rb.velocity += new Vector2(0, Mathf.Lerp(0, Mathf.Abs(rb.velocity.y), 1));
+                //rb.AddForce(new Vector2(0, rb.gravityScale + glideDragForce));
+
+                //rb.velocity = new Vector2(velocity.x, Mathf.MoveTowards(rb.velocity.y, 0, (15 * Mathf.Abs(rb.velocity.y)) * Time.deltaTime)); GOOD
+
+                rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
             }
 
             return;
