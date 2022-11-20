@@ -112,14 +112,14 @@ public class PlayerJump : MonoBehaviour
 
             //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
 
-            gravMultiplier = 0.5f;
+            gravMultiplier = 0.7f;
             int downCurrents = 0;
 
             foreach(GameObject current in airCurrentsAffecting)
             {
                 if(current.GetComponent<AirCurrent>().velocity.y < 0)
                 {
-                    rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, 100));
+                    rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, speedLimit + 3));
                     downCurrents++;
                     //glideSpeedLimit = -4;
                 }
@@ -137,6 +137,8 @@ public class PlayerJump : MonoBehaviour
 
                 rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
             }
+
+            rb.velocity = new Vector3(velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 3, speedLimit + 3));
 
             return;
         }
