@@ -334,6 +334,7 @@ MonoBehaviour:
   speedLimitX: 15
   glideSpeedLimit: -2
   glideDragRampTime: 0.3
+  glideTime: 125
   velocity: {x: 0, y: 0}
   jumpSpeed: 0
   gravMultiplier: 1

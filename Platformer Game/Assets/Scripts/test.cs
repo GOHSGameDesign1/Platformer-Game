@@ -19,7 +19,7 @@ public class test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(ground.GetOnGround());
+        //Debug.Log(ground.GetOnGround());
         gliding = GetComponent<PlayerJump>().inputGliding;
 
         spriteRenderer.color = (gliding != 0) ? Color.red : Color.green;

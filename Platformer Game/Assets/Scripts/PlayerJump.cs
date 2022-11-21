@@ -22,13 +22,15 @@ public class PlayerJump : MonoBehaviour
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimitY;
     [SerializeField][Tooltip("The fastest horizontal speed")] public float speedLimitX;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
-    [SerializeField] public float glideDragRampTime;
+    [SerializeField][Tooltip("How long it takes for the character to reduce to gliding fall speed")] public float glideDragRampTime;
+    [SerializeField][Tooltip("How long character can glide for (currently in frames)")] public float glideTime;
 
     [Header("Calculations")]
     public Vector2 velocity;
     public float jumpSpeed;
     private float defaultGravityScale;
     private float counter;
+    private float glideCounter;
     public float gravMultiplier;
     private float refVelocity = 1;
 
@@ -49,6 +51,7 @@ public class PlayerJump : MonoBehaviour
         airCurrentsAffecting= new HashSet<GameObject>();
         defaultGravityScale = 1f;
         counter = 0;
+        gliding = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -83,8 +86,17 @@ public class PlayerJump : MonoBehaviour
         //Get velocity from Rigidbody 
         velocity = rb.velocity;
 
+        if(onGround)
+        {
+            glideCounter = glideTime;
+        } else if(gliding)
+        {
+            glideCounter--;
+        }
+        Debug.Log(glideCounter);
+
         //If in air, not jumping, and inputting gliding, set gliding to true
-        if(!onGround && !currentlyJumping && (inputGliding != 0)) 
+        if(!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0)) 
         { 
             gliding = true;
         } else
@@ -144,6 +156,7 @@ public class PlayerJump : MonoBehaviour
                 counter += Time.fixedDeltaTime;
             }
 
+            //glide-specific clamp
             rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -speedLimitX, speedLimitX), Mathf.Clamp(rb.velocity.y, -speedLimitY - 5, speedLimitY + 3));
 
             //return to ignore the clamp down below
@@ -177,19 +190,7 @@ public class PlayerJump : MonoBehaviour
             }
             else
             {
-                /*// if falling and inputting a glide clamp the velocity to -3
-                if (gliding) 
-                {
-                    Debug.Log("gliding");
-                    rb.velocity = new Vector2(velocity.x, Mathf.Clamp(rb.velocity.y, glideSpeedLimit, 100));
-
-                    gravMultiplier = 0.1f;
-
-                    //Return to ignore the other clamp down below
-                    return;
-                }*/
                 
-
                 //Otherwise, apply the downward gravity multiplier as Kit comes back to Earth
                 gravMultiplier = downwardMovementMultiplier;
             }
