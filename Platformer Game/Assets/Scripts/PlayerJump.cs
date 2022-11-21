@@ -66,6 +66,7 @@ public class PlayerJump : MonoBehaviour
         //Get current ground status from ground script
         onGround = ground.GetOnGround();
 
+        //Get whether player is inputting glide action or not
         inputGliding = playerActions.Player.Glide.ReadValue<float>();
     }
 
@@ -81,6 +82,7 @@ public class PlayerJump : MonoBehaviour
         //Get velocity from Rigidbody 
         velocity = rb.velocity;
 
+        //If in air, not jumping, and inputting gliding, set gliding to true
         if(!onGround && !currentlyJumping && (inputGliding != 0)) 
         { 
             gliding = true;
@@ -138,8 +140,9 @@ public class PlayerJump : MonoBehaviour
                 rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
             }
 
-            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 3, speedLimit + 3));
+            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 5, speedLimit + 3));
 
+            //return to ignore the clamp down below
             return;
         }
 
