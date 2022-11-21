@@ -110,6 +110,7 @@ public class PlayerJump : MonoBehaviour
         }*/
 
         glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
+        glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
         //Debug.Log(glideCounter);
 
         //If in air, not jumping, and inputting gliding, set gliding to true
