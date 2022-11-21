@@ -21,14 +21,13 @@ public class PlayerJump : MonoBehaviour
     [Header("Options")]
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimit;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
-    [SerializeField] public float glideDragVelocity;
-    [SerializeField] public float glideDragRampSpeed;
-    [SerializeField] public float glideDragForce;
+    [SerializeField] public float glideDragRampTime;
 
     [Header("Calculations")]
     public Vector2 velocity;
     public float jumpSpeed;
     private float defaultGravityScale;
+    private float counter;
     public float gravMultiplier;
     private float refVelocity = 1;
 
@@ -48,6 +47,7 @@ public class PlayerJump : MonoBehaviour
         playerActions = new PlayerInputActions();
         airCurrentsAffecting= new HashSet<GameObject>();
         defaultGravityScale = 1f;
+        counter = 0;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -137,7 +137,10 @@ public class PlayerJump : MonoBehaviour
 
                 //rb.velocity = new Vector2(velocity.x, Mathf.MoveTowards(rb.velocity.y, 0, (15 * Mathf.Abs(rb.velocity.y)) * Time.deltaTime)); GOOD
 
-                rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / 2);
+                //rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / Mathf.Lerp(20, 1, counter/1f));
+
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Lerp(rb.velocity.y, 0, counter / glideDragRampTime));
+                counter += Time.fixedDeltaTime;
             }
 
             rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 5, speedLimit + 3));
@@ -145,6 +148,7 @@ public class PlayerJump : MonoBehaviour
             //return to ignore the clamp down below
             return;
         }
+        counter = 0; //reset counter if not gliding
 
         //If player is going up...
         if (rb.velocity.y > 0.01f)
