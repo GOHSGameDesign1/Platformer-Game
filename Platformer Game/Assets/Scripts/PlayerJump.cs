@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerJump : MonoBehaviour
 {
     [Header("Components")]
     characterGround ground;
     Rigidbody2D rb;
+    Image glideBar;
 
     PlayerInputActions playerActions;
 
@@ -47,6 +49,7 @@ public class PlayerJump : MonoBehaviour
         // finds components, set variables, and makes a new instance of input
         ground = GetComponent<characterGround>();
         rb = GetComponent<Rigidbody2D>();
+        glideBar = transform.GetChild(0).transform.GetChild(0).GetComponent<Image>();
         playerActions = new PlayerInputActions();
         airCurrentsAffecting= new HashSet<GameObject>();
         defaultGravityScale = 1f;
@@ -89,10 +92,13 @@ public class PlayerJump : MonoBehaviour
         if(onGround)
         {
             glideCounter = glideTime;
+            glideBar.CrossFadeAlpha(0, 0.3f, false);
         } else if(gliding)
         {
-            glideCounter--;
+            glideBar.CrossFadeAlpha(1, 0.5f, false);
+            glideCounter --;
         }
+        glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
         Debug.Log(glideCounter);
 
         //If in air, not jumping, and inputting gliding, set gliding to true
