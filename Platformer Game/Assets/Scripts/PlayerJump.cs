@@ -92,14 +92,25 @@ public class PlayerJump : MonoBehaviour
         if(onGround)
         {
             glideCounter = glideTime;
+
+            //hide timer
             glideBar.CrossFadeAlpha(0, 0.3f, false);
         } else if(gliding)
         {
-            glideBar.CrossFadeAlpha(1, 0.5f, false);
+            //show timer
+            glideBar.CrossFadeAlpha(1, 0.2f, false);
+
             glideCounter --;
         }
+
+        /*if (!gliding)
+        {
+            //hide timer
+            glideBar.CrossFadeAlpha(0, 0.2f, false);
+        }*/
+
         glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
-        Debug.Log(glideCounter);
+        //Debug.Log(glideCounter);
 
         //If in air, not jumping, and inputting gliding, set gliding to true
         if(!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0)) 
