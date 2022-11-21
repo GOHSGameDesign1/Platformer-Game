@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 5246765}
   - component: {fileID: 5246766}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecaf9489eea1ef04692b764ab1e5c8cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundLength: 0.8
+  groundLength: 0.805
   colliderOffset: {x: 0.6, y: 0, z: 0}
   groundLayer:
     serializedVersion: 2
@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23224a6dca83fbe49a7a217bbbb2e9bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
+  maxSpeed: 9.5
   maxAcceleration: 52
   maxDecceleration: 52
   maxTurnSpeed: 80
@@ -330,12 +330,14 @@ MonoBehaviour:
   upwardMovementMultiplier: 1
   downwardMovementMultiplier: 1.76
   maxAirJumps: 0
-  speedLimit: 15
+  speedLimitY: 15
+  speedLimitX: 15
   glideSpeedLimit: -2
   glideDragRampTime: 0.3
   velocity: {x: 0, y: 0}
   jumpSpeed: 0
   gravMultiplier: 1
+  desiredJump: 0
   inputGliding: 0
   onGround: 0
   currentlyJumping: 0

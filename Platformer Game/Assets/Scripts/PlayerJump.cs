@@ -19,7 +19,8 @@ public class PlayerJump : MonoBehaviour
     [SerializeField, Range(0, 1)][Tooltip("How many times can you jump in the air?")] public int maxAirJumps = 0;
 
     [Header("Options")]
-    [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimit;
+    [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimitY;
+    [SerializeField][Tooltip("The fastest horizontal speed")] public float speedLimitX;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
     [SerializeField] public float glideDragRampTime;
 
@@ -32,7 +33,7 @@ public class PlayerJump : MonoBehaviour
     private float refVelocity = 1;
 
     [Header("Current State")]
-    private bool desiredJump;
+    [SerializeField] private bool desiredJump;
     [SerializeField] public float inputGliding;
     public bool onGround;
     [SerializeField] private bool currentlyJumping;
@@ -121,7 +122,7 @@ public class PlayerJump : MonoBehaviour
             {
                 if(current.GetComponent<AirCurrent>().velocity.y < 0)
                 {
-                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -speedLimit -3, speedLimit + 3));
+                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -speedLimitY -3, speedLimitY + 3));
                     downCurrents++;
                     //glideSpeedLimit = -4;
                 }
@@ -143,7 +144,7 @@ public class PlayerJump : MonoBehaviour
                 counter += Time.fixedDeltaTime;
             }
 
-            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -speedLimit - 5, speedLimit + 3));
+            rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -speedLimitX, speedLimitX), Mathf.Clamp(rb.velocity.y, -speedLimitY - 5, speedLimitY + 3));
 
             //return to ignore the clamp down below
             return;
@@ -207,7 +208,7 @@ public class PlayerJump : MonoBehaviour
         }
         //Set the character's Rigidbody's velocity
         //But clamp the Y variable within the bounds of the speed limit, for the terminal velocity assist option
-        rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimit, 100));
+        rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimitY, 100));
     }
 
     private void DoAJump()
