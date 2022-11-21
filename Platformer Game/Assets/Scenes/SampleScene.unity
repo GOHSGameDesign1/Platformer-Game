@@ -1165,7 +1165,7 @@ MonoBehaviour:
   playerJump: {fileID: 5246766}
   upwardForce: 20
   playerInside: 0
-  velocity: {x: -0.090283394, y: -5.066107, z: 0.035240013}
+  velocity: {x: -0.090283394, y: 3.1652632, z: 0.035240013}
 --- !u!114 &2013166109
 MonoBehaviour:
   m_ObjectHideFlags: 0

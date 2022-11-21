@@ -259,7 +259,6 @@ public class PlayerJump : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("triggered");
 
         airCurrentsAffecting.Add(collision.gameObject);
     }
