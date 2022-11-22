@@ -332,7 +332,7 @@ MonoBehaviour:
   downwardMovementMultiplier: 1.76
   maxAirJumps: 0
   speedLimitY: 15
-  speedLimitX: 15
+  speedLimitX: 27
   glideSpeedLimit: -2
   glideDragRampTime: 0.3
   glideTime: 150
