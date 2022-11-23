@@ -21,9 +21,10 @@ public class PlayerJump : MonoBehaviour
     [SerializeField, Range(0, 1)][Tooltip("How many times can you jump in the air?")] public int maxAirJumps = 0;
 
     [Header("Options")]
-    [SerializeField][Tooltip("The fastest speed the character can fall")] public float speedLimitY;
-    [SerializeField][Tooltip("The fastest horizontal speed")] public float speedLimitX;
-    [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideSpeedLimit;
+    public float fallSpeedLimit;
+    [SerializeField][Tooltip("The fastest speed the character can fall")] public float glideSpeedLimitY;
+    [SerializeField][Tooltip("The fastest horizontal speed")] public float glideSpeedLimitX;
+    [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideFallSpeedLimit;
     [SerializeField][Tooltip("How long it takes for the character to reduce to gliding fall speed")] public float glideDragRampTime;
     [SerializeField][Tooltip("How long character can glide for (currently in frames)")] public float glideTime;
 
@@ -145,14 +146,14 @@ public class PlayerJump : MonoBehaviour
 
             //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
 
-            gravMultiplier = 0.7f;
+            //gravMultiplier = upwardMovementMultiplier;
             int downCurrents = 0;
 
             foreach(GameObject current in airCurrentsAffecting)
             {
-                if(current.GetComponent<AirCurrent>().velocity.y < 0)
+                if(current.GetComponent<AirCurrent>().velocity.y < -0.01f)
                 {
-                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -speedLimitY -3, speedLimitY + 3));
+                    rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(velocity.y, -glideSpeedLimitY , glideSpeedLimitY));
                     downCurrents++;
                     //glideSpeedLimit = -4;
                 }
@@ -160,7 +161,7 @@ public class PlayerJump : MonoBehaviour
                 rb.velocity += (Vector2)current.GetComponent<AirCurrent>().velocity;
             }
 
-            if(rb.velocity.y < glideSpeedLimit && (downCurrents == 0))
+            if(rb.velocity.y < glideFallSpeedLimit && (downCurrents == 0))
             {
                 //rb.velocity = new Vector3(velocity.x, Mathf.SmoothDamp(velocity.y, glideSpeedLimit, ref refVelocity, Time.fixedDeltaTime));
                 //rb.velocity += new Vector2(0, Mathf.Lerp(0, Mathf.Abs(rb.velocity.y), 1));
@@ -175,7 +176,7 @@ public class PlayerJump : MonoBehaviour
             }
 
             //glide-specific clamp
-            rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -speedLimitX, speedLimitX), Mathf.Clamp(rb.velocity.y, -speedLimitY - 5, speedLimitY + 3));
+            rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -glideSpeedLimitX, glideSpeedLimitX), Mathf.Clamp(rb.velocity.y, -glideSpeedLimitY, glideSpeedLimitY));
 
             //return to ignore the clamp down below
             return;
@@ -227,7 +228,7 @@ public class PlayerJump : MonoBehaviour
         }
         //Set the character's Rigidbody's velocity
         //But clamp the Y variable within the bounds of the speed limit, for the terminal velocity assist option
-        rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -speedLimitY, 100));
+        rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, -fallSpeedLimit, 100));
     }
 
     private void DoAJump()
