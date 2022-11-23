@@ -162,7 +162,7 @@ public class PlayerJump : MonoBehaviour
         glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
 
         //If in air, not jumping, and inputting gliding, set gliding to true
-        if (!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0))
+        if (!onGround && (rb.velocity.y < -0.01f) && (inputGliding != 0) && (glideCounter > 0))
         {
             gliding = true;
         }
@@ -224,7 +224,6 @@ public class PlayerJump : MonoBehaviour
         //Else if going down...
         else if (rb.velocity.y < -0.01f)
         {
-            if(currentlyJumping) { currentlyJumping= false; }
 
             if (onGround)
             //Don't change it if Kit is stood on something (such as a moving platform)
@@ -261,6 +260,8 @@ public class PlayerJump : MonoBehaviour
         if (onGround || (coyoteTimeCounter > 0.03f && coyoteTimeCounter < coyoteTime))
         {
             desiredJump = false;
+            jumpBufferCounter = 0;
+            coyoteTimeCounter = 0;
 
             //Determine the power of the jump, based on our gravity and stats
             jumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * rb.gravityScale * jumpHeight);
@@ -280,8 +281,6 @@ public class PlayerJump : MonoBehaviour
             velocity.y += jumpSpeed;
             currentlyJumping = true;
         }
-
-        desiredJump = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
