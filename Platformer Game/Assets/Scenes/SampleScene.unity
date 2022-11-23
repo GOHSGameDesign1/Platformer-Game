@@ -331,9 +331,10 @@ MonoBehaviour:
   upwardMovementMultiplier: 1
   downwardMovementMultiplier: 1.76
   maxAirJumps: 0
-  speedLimitY: 20
-  speedLimitX: 27
-  glideSpeedLimit: -2
+  fallSpeedLimit: 17
+  glideSpeedLimitY: 25
+  glideSpeedLimitX: 27
+  glideFallSpeedLimit: -1
   glideDragRampTime: 0.3
   glideTime: 150
   velocity: {x: 0, y: 0}
@@ -693,7 +694,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.7
+      scalar: 0.6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -1244,7 +1245,7 @@ ParticleSystem:
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
-    m_Position: {x: 0, y: -13.5, z: 0}
+    m_Position: {x: 0, y: -7, z: 0}
     m_Rotation: {x: -0, y: 0, z: 0}
     m_Scale: {x: 10, y: 6, z: 0}
     placementMode: 0
@@ -1444,7 +1445,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 25
+      scalar: 12
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -2120,7 +2121,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 40
+      scalar: 30
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -2341,7 +2342,7 @@ ParticleSystem:
     orbitalZ:
       serializedVersion: 2
       minMaxState: 1
-      scalar: 0.4
+      scalar: 0
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -6054,7 +6055,7 @@ MonoBehaviour:
   m_LookaheadTime: 0.3
   m_LookaheadSmoothing: 3
   m_LookaheadIgnoreY: 1
-  m_XDamping: 0.6
+  m_XDamping: 1
   m_YDamping: 0.6
   m_ZDamping: 0
   m_TargetMovementOnly: 1
@@ -6203,8 +6204,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2013166104}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.2141, y: 19.2745, z: 0.011746671}
-  m_LocalScale: {x: 16.108, y: 48.6189, z: 0}
+  m_LocalPosition: {x: 13.1, y: 2.8, z: 0.011746671}
+  m_LocalScale: {x: 10, y: 20, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 355086978}
@@ -6224,26 +6225,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInside: 0
-  velocity: {x: 0.056617737, y: 8.152157, z: 0}
-  magnitude: 3
-  particleCount: 12
-  aniCurve:
+  <velocity>k__BackingField: {x: 0, y: 0, z: 0}
+  <magnitude>k__BackingField: 3
+  <particleCount>k__BackingField: 10
+  <aniCurve>k__BackingField:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: -1
-      inSlope: 1.26
-      outSlope: 1.26
+      inSlope: 0.26621282
+      outSlope: 0.26621282
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
+      time: 0.50291675
+      value: -0.8661171
+      inSlope: -0.0015620589
+      outSlope: -0.0015620589
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
       time: 1
-      value: 0.26
-      inSlope: 1.26
-      outSlope: 1.26
+      value: -1
+      inSlope: -0.26933694
+      outSlope: -0.26933694
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -6306,7 +6316,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 47f2bea49f99a934b8dab9f36e3cf4e3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.18431373}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
