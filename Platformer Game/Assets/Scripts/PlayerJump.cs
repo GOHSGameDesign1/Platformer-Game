@@ -35,7 +35,7 @@ public class PlayerJump : MonoBehaviour
     public float jumpSpeed;
     private float defaultGravityScale;
     private float counter;
-    private float glideCounter;
+    [HideInInspector] public float glideCounter;
     public float gravMultiplier;
     private float refVelocity = 1;
 
@@ -44,6 +44,7 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] public float inputGliding;
     public bool onGround;
     [SerializeField] private bool currentlyJumping;
+    [SerializeField] private bool ascendingFromJump;
     [SerializeField] private bool gliding;
     private float jumpBufferCounter;
     private float coyoteTimeCounter = 0;
@@ -60,6 +61,7 @@ public class PlayerJump : MonoBehaviour
         defaultGravityScale = 1f;
         counter = 0;
         gliding = false;
+        ascendingFromJump = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -162,7 +164,7 @@ public class PlayerJump : MonoBehaviour
         glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
 
         //If in air, not jumping, and inputting gliding, set gliding to true
-        if (!onGround && (rb.velocity.y < -0.01f) && (inputGliding != 0) && (glideCounter > 0))
+        if (!onGround && !ascendingFromJump && (inputGliding != 0) && (glideCounter > 0))
         {
             gliding = true;
         }
@@ -224,6 +226,8 @@ public class PlayerJump : MonoBehaviour
         //Else if going down...
         else if (rb.velocity.y < -0.01f)
         {
+            //No longer ascending if falling 
+            if(ascendingFromJump) { ascendingFromJump= false; }
 
             if (onGround)
             //Don't change it if Kit is stood on something (such as a moving platform)
@@ -260,6 +264,7 @@ public class PlayerJump : MonoBehaviour
         if (onGround || (coyoteTimeCounter > 0.03f && coyoteTimeCounter < coyoteTime))
         {
             desiredJump = false;
+            ascendingFromJump = true;
             jumpBufferCounter = 0;
             coyoteTimeCounter = 0;
 
@@ -285,12 +290,15 @@ public class PlayerJump : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        airCurrentsAffecting.Add(collision.gameObject);
+        if (collision.tag == "Current")
+        {
+            airCurrentsAffecting.Add(collision.gameObject);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject != null)
+        if (collision.tag == "Current")
         {
             airCurrentsAffecting.Remove(collision.gameObject);
         }
