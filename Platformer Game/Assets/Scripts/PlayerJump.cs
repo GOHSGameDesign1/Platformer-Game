@@ -90,38 +90,7 @@ public class PlayerJump : MonoBehaviour
         //Get velocity from Rigidbody 
         velocity = rb.velocity;
 
-        if(onGround)
-        {
-            glideCounter = glideTime;
-
-            //hide timer
-            glideBar.CrossFadeAlpha(0, 0.3f, false);
-        } else if(gliding)
-        {
-            //show timer
-            glideBar.CrossFadeAlpha(1, 0.2f, false);
-
-            glideCounter --;
-        }
-
-        /*if (!gliding)
-        {
-            //hide timer
-            glideBar.CrossFadeAlpha(0, 0.2f, false);
-        }*/
-
-        glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
-        glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
-        //Debug.Log(glideCounter);
-
-        //If in air, not jumping, and inputting gliding, set gliding to true
-        if(!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0)) 
-        { 
-            gliding = true;
-        } else
-        {
-            gliding = false;
-        }
+        ManageGliding();
 
         if (desiredJump)
         {
@@ -136,17 +105,45 @@ public class PlayerJump : MonoBehaviour
         CalculateGravity();
     }
 
+    void ManageGliding()
+    {
+        //Reduce glideCounter if gliding, reset if touched ground
+        if (onGround)
+        {
+            glideCounter = glideTime;
+
+            //hide glide bar
+            glideBar.CrossFadeAlpha(0, 0.3f, false);
+        }
+        else if (gliding)
+        {
+            //show glide bar
+            glideBar.CrossFadeAlpha(1, 0.2f, false);
+
+            glideCounter--;
+        }
+
+        //Manage glide bar;
+        glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
+        glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
+
+        //If in air, not jumping, and inputting gliding, set gliding to true
+        if (!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0))
+        {
+            gliding = true;
+        }
+        else
+        {
+            gliding = false;
+        }
+    }
+
     private void CalculateGravity()
     {
         //We change the character's gravity based on her Y direction
 
         if(gliding)
         {
-             //rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, glideSpeedLimit, 10));
-
-            //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
-
-            //gravMultiplier = upwardMovementMultiplier;
             int downCurrents = 0;
 
             foreach(GameObject current in airCurrentsAffecting)
@@ -163,14 +160,6 @@ public class PlayerJump : MonoBehaviour
 
             if(rb.velocity.y < glideFallSpeedLimit && (downCurrents == 0))
             {
-                //rb.velocity = new Vector3(velocity.x, Mathf.SmoothDamp(velocity.y, glideSpeedLimit, ref refVelocity, Time.fixedDeltaTime));
-                //rb.velocity += new Vector2(0, Mathf.Lerp(0, Mathf.Abs(rb.velocity.y), 1));
-                //rb.AddForce(new Vector2(0, rb.gravityScale + glideDragForce));
-
-                //rb.velocity = new Vector2(velocity.x, Mathf.MoveTowards(rb.velocity.y, 0, (15 * Mathf.Abs(rb.velocity.y)) * Time.deltaTime)); GOOD
-
-                //rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / Mathf.Lerp(20, 1, counter/1f));
-
                 rb.velocity = new Vector2(rb.velocity.x, Mathf.Lerp(rb.velocity.y, 0, counter / glideDragRampTime));
                 counter += Time.fixedDeltaTime;
             }
@@ -181,6 +170,7 @@ public class PlayerJump : MonoBehaviour
             //return to ignore the clamp down below
             return;
         }
+
         counter = 0; //reset counter if not gliding
 
         //If player is going up...
