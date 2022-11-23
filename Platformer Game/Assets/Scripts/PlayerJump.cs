@@ -21,7 +21,9 @@ public class PlayerJump : MonoBehaviour
     [SerializeField, Range(0, 1)][Tooltip("How many times can you jump in the air?")] public int maxAirJumps = 0;
 
     [Header("Options")]
-    public float fallSpeedLimit;
+    [SerializeField, Range(0f, 0.3f)][Tooltip("How long should coyote time last?")] public float coyoteTime = 0.15f;
+    [SerializeField, Range(0f, 0.3f)][Tooltip("How far from ground should we cache your jump?")] public float jumpBuffer = 0.15f;
+    [SerializeField][Tooltip("How fast the character can fall while not gliding")] public float fallSpeedLimit;
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float glideSpeedLimitY;
     [SerializeField][Tooltip("The fastest horizontal speed")] public float glideSpeedLimitX;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideFallSpeedLimit;
@@ -43,6 +45,8 @@ public class PlayerJump : MonoBehaviour
     public bool onGround;
     [SerializeField] private bool currentlyJumping;
     [SerializeField] private bool gliding;
+    private float jumpBufferCounter;
+    private float coyoteTimeCounter = 0;
     [field:SerializeField] public HashSet<GameObject> airCurrentsAffecting { get; private set; }
 
     void Awake()
@@ -73,6 +77,36 @@ public class PlayerJump : MonoBehaviour
 
         //Get current ground status from ground script
         onGround = ground.GetOnGround();
+
+        //Jump buffer allows us to queue up a jump, which will play when we next hit the ground
+        if (jumpBuffer > 0)
+        {
+            //Instead of immediately turning off "desireJump", start counting up...
+            //All the while, the DoAJump function will repeatedly be fired off
+            if (desiredJump)
+            {
+                jumpBufferCounter += Time.deltaTime;
+
+                if (jumpBufferCounter > jumpBuffer)
+                {
+                    //If time exceeds the jump buffer, turn off "desireJump"
+                    desiredJump = false;
+                    jumpBufferCounter = 0;
+                }
+            }
+        }
+
+        //If we're not on the ground and we're not currently jumping, that means we've stepped off the edge of a platform.
+        //So, start the coyote time counter...
+        if (!currentlyJumping && !onGround)
+        {
+            coyoteTimeCounter += Time.deltaTime;
+        }
+        else
+        {
+            //Reset it when we touch the ground, or jump
+            coyoteTimeCounter = 0;
+        }
 
         //Get whether player is inputting glide action or not
         inputGliding = playerActions.Player.Glide.ReadValue<float>();
@@ -223,7 +257,8 @@ public class PlayerJump : MonoBehaviour
 
     private void DoAJump()
     {
-        if (onGround)
+        //Create the jump, provided we are on the ground or in coyote time.
+        if (onGround || (coyoteTimeCounter > 0.03f && coyoteTimeCounter < coyoteTime))
         {
             desiredJump = false;
 
