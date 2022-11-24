@@ -133,10 +133,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5246762}
   - component: {fileID: 5246761}
-  - component: {fileID: 5246760}
   - component: {fileID: 5246759}
   - component: {fileID: 5246763}
-  - component: {fileID: 5246764}
   - component: {fileID: 5246765}
   - component: {fileID: 5246766}
   - component: {fileID: 5246767}
@@ -168,32 +166,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!61 &5246760
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5246758}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.023376226}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5637523, y: 0.42258653}
-    oldSize: {x: 4.8, y: 6.4}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.0764973, y: 1.5218015}
-  m_EdgeRadius: 0
 --- !u!212 &5246761
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -279,19 +251,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
---- !u!114 &5246764
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5246758}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1787a813ad76c648877146916e2f033, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gliding: 0
 --- !u!114 &5246765
 MonoBehaviour:
   m_ObjectHideFlags: 0
