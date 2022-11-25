@@ -5,21 +5,20 @@ using UnityEngine;
 public class FallingPlatform : MonoBehaviour
 {
     public float maxFallSpeed;
+    [field: SerializeField] public float fallDelay { get; private set; }
+    [field: SerializeField] public float deathDelay { get; private set; }
 
+    [Header("Components")]
     private Rigidbody2D rb;
-    private bool falling;
+    private PlatformEffector2D pe;
+    private BoxCollider2D collide;
     // Start is called before the first frame update
     void Awake()
     {
-        falling = false;
         rb = GetComponent<Rigidbody2D>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        pe = GetComponent<PlatformEffector2D>();
+        collide = GetComponent<BoxCollider2D>();
+    } 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -29,20 +28,22 @@ public class FallingPlatform : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        if(falling) 
-        {
-            if(Mathf.Abs(rb.velocity.y) < maxFallSpeed)
-            {
-                rb.velocity += Vector2.down / 2;
-            }
-        }
-    }
-
     IEnumerator aboutToFall()
     {
-        yield return new WaitForSeconds(0.2f);
-        falling = true;
+        yield return new WaitForSeconds(fallDelay);
+        pe.useOneWay = true;
+
+        //Change the layer so player doesn't get onGround from the falling platform;
+        gameObject.layer = 7; // 7 is the falling LayerMask
+
+        // disable the collider for one frame so the oneway can trigger for the player if its already touching the platform
+        collide.enabled = false;
+        yield return null;
+        collide.enabled = true;
+
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = 4.0f;
+
+        Destroy(gameObject, deathDelay);
     }
 }
