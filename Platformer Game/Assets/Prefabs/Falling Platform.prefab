@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxFallSpeed: 30
-  <fallDelay>k__BackingField: 0.4
+  <fallDelay>k__BackingField: 0.6
   <deathDelay>k__BackingField: 2
 --- !u!50 &930533412420308630
 Rigidbody2D:

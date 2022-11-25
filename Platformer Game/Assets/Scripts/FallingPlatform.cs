@@ -12,12 +12,14 @@ public class FallingPlatform : MonoBehaviour
     private Rigidbody2D rb;
     private PlatformEffector2D pe;
     private BoxCollider2D collide;
+    private SpriteRenderer sr;
     // Start is called before the first frame update
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         pe = GetComponent<PlatformEffector2D>();
         collide = GetComponent<BoxCollider2D>();
+        sr = GetComponent<SpriteRenderer>();
     } 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -30,6 +32,7 @@ public class FallingPlatform : MonoBehaviour
 
     IEnumerator aboutToFall()
     {
+        sr.color = Color.black;
         yield return new WaitForSeconds(fallDelay);
         pe.useOneWay = true;
 
