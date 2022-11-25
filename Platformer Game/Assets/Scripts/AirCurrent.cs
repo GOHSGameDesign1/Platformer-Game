@@ -5,9 +5,7 @@ using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class AirCurrent : MonoBehaviour
-{
-    [SerializeField] private bool playerInside;
-
+{ 
     [field: SerializeField] public Vector3 velocity { get; private set; }
     [field: SerializeField][Tooltip("How fast the wind pushes the player (and the particles)")] public float magnitude { get; private set; }
     [field: SerializeField][Tooltip("How many particles there are (divided by 10 and multiplied by width")] public float particleCount { get; private set; }
@@ -17,7 +15,6 @@ public class AirCurrent : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        playerInside = false;
         airParticles = transform.GetChild(0).GetComponent<ParticleSystem>();
     }
 
@@ -52,23 +49,6 @@ public class AirCurrent : MonoBehaviour
         shape.scale = new Vector3(transform.lossyScale.x, 6, 0);
 
         emission.rateOverTime = particleCount / 10f * transform.lossyScale.x;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-
-        if(collision.tag == "Player")
-        {
-            playerInside= true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.tag == "Player")
-        {
-            playerInside = false;
-        }
     }
 
     private void OnDrawGizmos()
