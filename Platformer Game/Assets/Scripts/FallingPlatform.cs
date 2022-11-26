@@ -44,7 +44,7 @@ public class FallingPlatform : MonoBehaviour
         pe.useOneWay = true;
 
         //starts countdown to spawn new platform;
-        PlatformManager.Instance.StartSpawnPlatform(2f, transform.position, transform.rotation.z);
+        PlatformManager.Instance.StartSpawnPlatform(3f, transform.position, transform.rotation.z);
 
         //Change the layer so player doesn't get onGround from the falling platform;
         gameObject.layer = 7; // 7 is the falling LayerMask
