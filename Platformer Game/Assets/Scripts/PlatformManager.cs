@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlatformManager : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class PlatformManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        DontDestroyOnLoad(gameObject);
+       // DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -37,4 +38,7 @@ public class PlatformManager : MonoBehaviour
         yield return new WaitForSeconds(waitTime);
         Instantiate(_FallingPlatformPrefab, position, Quaternion.Euler(Vector3.forward * rotAngle));
     }
+    
+
+    
 }
