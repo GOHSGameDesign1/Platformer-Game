@@ -881,7 +881,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpHeight: 4.36
-  timeToJumpApex: 0.471
+  timeToJumpApex: 0.5
   upwardMovementMultiplier: 1
   downwardMovementMultiplier: 1.76
   maxAirJumps: 0
