@@ -21,7 +21,9 @@ public class PlayerJump : MonoBehaviour
     [SerializeField, Range(0, 1)][Tooltip("How many times can you jump in the air?")] public int maxAirJumps = 0;
 
     [Header("Options")]
-    public float fallSpeedLimit;
+    [SerializeField, Range(0f, 0.3f)][Tooltip("How long should coyote time last?")] public float coyoteTime = 0.15f;
+    [SerializeField, Range(0f, 0.3f)][Tooltip("How far from ground should we cache your jump?")] public float jumpBuffer = 0.15f;
+    [SerializeField][Tooltip("How fast the character can fall while not gliding")] public float fallSpeedLimit;
     [SerializeField][Tooltip("The fastest speed the character can fall")] public float glideSpeedLimitY;
     [SerializeField][Tooltip("The fastest horizontal speed")] public float glideSpeedLimitX;
     [SerializeField][Tooltip("How fast the player falls when gliding")] public float glideFallSpeedLimit;
@@ -33,7 +35,7 @@ public class PlayerJump : MonoBehaviour
     public float jumpSpeed;
     private float defaultGravityScale;
     private float counter;
-    private float glideCounter;
+    [HideInInspector] public float glideCounter;
     public float gravMultiplier;
     private float refVelocity = 1;
 
@@ -42,7 +44,10 @@ public class PlayerJump : MonoBehaviour
     [SerializeField] public float inputGliding;
     public bool onGround;
     [SerializeField] private bool currentlyJumping;
+    [SerializeField] private bool ascendingFromJump;
     [SerializeField] private bool gliding;
+    private float jumpBufferCounter;
+    private float coyoteTimeCounter = 0;
     [field:SerializeField] public HashSet<GameObject> airCurrentsAffecting { get; private set; }
 
     void Awake()
@@ -56,6 +61,7 @@ public class PlayerJump : MonoBehaviour
         defaultGravityScale = 1f;
         counter = 0;
         gliding = false;
+        ascendingFromJump = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -74,6 +80,36 @@ public class PlayerJump : MonoBehaviour
         //Get current ground status from ground script
         onGround = ground.GetOnGround();
 
+        //Jump buffer allows us to queue up a jump, which will play when we next hit the ground
+        if (jumpBuffer > 0)
+        {
+            //Instead of immediately turning off "desireJump", start counting up...
+            //All the while, the DoAJump function will repeatedly be fired off
+            if (desiredJump)
+            {
+                jumpBufferCounter += Time.deltaTime;
+
+                if (jumpBufferCounter > jumpBuffer)
+                {
+                    //If time exceeds the jump buffer, turn off "desireJump"
+                    desiredJump = false;
+                    jumpBufferCounter = 0;
+                }
+            }
+        }
+
+        //If we're not on the ground and we're not currently jumping, that means we've stepped off the edge of a platform.
+        //So, start the coyote time counter...
+        if (!currentlyJumping && !onGround)
+        {
+            coyoteTimeCounter += Time.deltaTime;
+        }
+        else
+        {
+            //Reset it when we touch the ground, or jump
+            coyoteTimeCounter = 0;
+        }
+
         //Get whether player is inputting glide action or not
         inputGliding = playerActions.Player.Glide.ReadValue<float>();
     }
@@ -90,38 +126,7 @@ public class PlayerJump : MonoBehaviour
         //Get velocity from Rigidbody 
         velocity = rb.velocity;
 
-        if(onGround)
-        {
-            glideCounter = glideTime;
-
-            //hide timer
-            glideBar.CrossFadeAlpha(0, 0.3f, false);
-        } else if(gliding)
-        {
-            //show timer
-            glideBar.CrossFadeAlpha(1, 0.2f, false);
-
-            glideCounter --;
-        }
-
-        /*if (!gliding)
-        {
-            //hide timer
-            glideBar.CrossFadeAlpha(0, 0.2f, false);
-        }*/
-
-        glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
-        glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
-        //Debug.Log(glideCounter);
-
-        //If in air, not jumping, and inputting gliding, set gliding to true
-        if(!onGround && !currentlyJumping && (inputGliding != 0) && (glideCounter > 0)) 
-        { 
-            gliding = true;
-        } else
-        {
-            gliding = false;
-        }
+        ManageGliding();
 
         if (desiredJump)
         {
@@ -136,17 +141,45 @@ public class PlayerJump : MonoBehaviour
         CalculateGravity();
     }
 
+    void ManageGliding()
+    {
+        //Reduce glideCounter if gliding, reset if touched ground
+        if (onGround)
+        {
+            glideCounter = glideTime;
+
+            //hide glide bar
+            glideBar.CrossFadeAlpha(0, 0.3f, false);
+        }
+        else if (gliding)
+        {
+            //show glide bar
+            glideBar.CrossFadeAlpha(1, 0.2f, false);
+
+            glideCounter--;
+        }
+
+        //Manage glide bar;
+        glideBar.fillAmount = Mathf.MoveTowards(glideBar.fillAmount, glideCounter / glideTime, 10 * Time.deltaTime);
+        glideBar.color = Color.Lerp(Color.red, Color.white, glideCounter / glideTime);
+
+        //If in air, not jumping, and inputting gliding, set gliding to true
+        if (!onGround && !ascendingFromJump && (inputGliding != 0) && (glideCounter > 0))
+        {
+            gliding = true;
+        }
+        else
+        {
+            gliding = false;
+        }
+    }
+
     private void CalculateGravity()
     {
         //We change the character's gravity based on her Y direction
 
         if(gliding)
         {
-             //rb.velocity = new Vector3(velocity.x, Mathf.Clamp(velocity.y, glideSpeedLimit, 10));
-
-            //rb.velocity.y = Mathf.MoveTowards(velocity.y, glideSpeedLimit, Time.deltaTime * 800);
-
-            //gravMultiplier = upwardMovementMultiplier;
             int downCurrents = 0;
 
             foreach(GameObject current in airCurrentsAffecting)
@@ -163,14 +196,6 @@ public class PlayerJump : MonoBehaviour
 
             if(rb.velocity.y < glideFallSpeedLimit && (downCurrents == 0))
             {
-                //rb.velocity = new Vector3(velocity.x, Mathf.SmoothDamp(velocity.y, glideSpeedLimit, ref refVelocity, Time.fixedDeltaTime));
-                //rb.velocity += new Vector2(0, Mathf.Lerp(0, Mathf.Abs(rb.velocity.y), 1));
-                //rb.AddForce(new Vector2(0, rb.gravityScale + glideDragForce));
-
-                //rb.velocity = new Vector2(velocity.x, Mathf.MoveTowards(rb.velocity.y, 0, (15 * Mathf.Abs(rb.velocity.y)) * Time.deltaTime)); GOOD
-
-                //rb.velocity += new Vector2(0, Mathf.Abs(rb.velocity.y) / Mathf.Lerp(20, 1, counter/1f));
-
                 rb.velocity = new Vector2(rb.velocity.x, Mathf.Lerp(rb.velocity.y, 0, counter / glideDragRampTime));
                 counter += Time.fixedDeltaTime;
             }
@@ -181,6 +206,7 @@ public class PlayerJump : MonoBehaviour
             //return to ignore the clamp down below
             return;
         }
+
         counter = 0; //reset counter if not gliding
 
         //If player is going up...
@@ -200,7 +226,8 @@ public class PlayerJump : MonoBehaviour
         //Else if going down...
         else if (rb.velocity.y < -0.01f)
         {
-            if(currentlyJumping) { currentlyJumping= false; }
+            //No longer ascending if falling 
+            if(ascendingFromJump) { ascendingFromJump= false; }
 
             if (onGround)
             //Don't change it if Kit is stood on something (such as a moving platform)
@@ -233,9 +260,13 @@ public class PlayerJump : MonoBehaviour
 
     private void DoAJump()
     {
-        if (onGround)
+        //Create the jump, provided we are on the ground or in coyote time.
+        if (onGround || (coyoteTimeCounter > 0.03f && coyoteTimeCounter < coyoteTime))
         {
             desiredJump = false;
+            ascendingFromJump = true;
+            jumpBufferCounter = 0;
+            coyoteTimeCounter = 0;
 
             //Determine the power of the jump, based on our gravity and stats
             jumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * rb.gravityScale * jumpHeight);
@@ -255,18 +286,19 @@ public class PlayerJump : MonoBehaviour
             velocity.y += jumpSpeed;
             currentlyJumping = true;
         }
-
-        desiredJump = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        airCurrentsAffecting.Add(collision.gameObject);
+        if (collision.tag == "Current")
+        {
+            airCurrentsAffecting.Add(collision.gameObject);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject != null)
+        if (collision.tag == "Current")
         {
             airCurrentsAffecting.Remove(collision.gameObject);
         }
