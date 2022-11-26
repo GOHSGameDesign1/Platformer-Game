@@ -21,13 +21,8 @@ public class PlayerDeath : MonoBehaviour
             //if touching the spike portion of the spike platform, then die
             if (col.IsTouchingLayers(spikeLayer))
             {
-                Destroy(gameObject);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
