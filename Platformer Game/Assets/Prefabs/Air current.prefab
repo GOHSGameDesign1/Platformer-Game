@@ -74,7 +74,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 029dcd84cf3387c46b92680a40dc5a91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInside: 0
   <velocity>k__BackingField: {x: 0, y: 0, z: 0}
   <magnitude>k__BackingField: 3
   <particleCount>k__BackingField: 12
@@ -166,7 +165,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 47f2bea49f99a934b8dab9f36e3cf4e3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.18431373}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.02745098}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
