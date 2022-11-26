@@ -66,7 +66,7 @@ public class PlayerJump : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && !gliding)
         {
             desiredJump = true;
         }
