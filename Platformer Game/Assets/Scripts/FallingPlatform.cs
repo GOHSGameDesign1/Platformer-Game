@@ -7,6 +7,7 @@ public class FallingPlatform : MonoBehaviour
     public float maxFallSpeed;
     [field: SerializeField] public float fallDelay { get; private set; }
     [field: SerializeField] public float deathDelay { get; private set; }
+    private bool falling;
 
     [Header("Components")]
     private Rigidbody2D rb;
@@ -20,21 +21,30 @@ public class FallingPlatform : MonoBehaviour
         pe = GetComponent<PlatformEffector2D>();
         collide = GetComponent<BoxCollider2D>();
         sr = GetComponent<SpriteRenderer>();
+
+        falling = false;
     } 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Player")
         {
-            StartCoroutine(aboutToFall());
+            if (!falling)
+            {
+                StartCoroutine(aboutToFall());
+            }
         }
     }
 
     IEnumerator aboutToFall()
     {
+        falling = true;
         sr.color = Color.black;
         yield return new WaitForSeconds(fallDelay);
         pe.useOneWay = true;
+
+        //starts countdown to spawn new platform;
+        PlatformManager.Instance.StartSpawnPlatform(2f, transform.position, transform.rotation.z);
 
         //Change the layer so player doesn't get onGround from the falling platform;
         gameObject.layer = 7; // 7 is the falling LayerMask
