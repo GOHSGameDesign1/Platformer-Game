@@ -10,8 +10,12 @@ public class PlayerJump : MonoBehaviour
     characterGround ground;
     Rigidbody2D rb;
     Image glideBar;
+    SpriteRenderer sr;
 
     PlayerInputActions playerActions;
+
+    [field: SerializeField] public Sprite walkSprite { get; private set; }
+    [field: SerializeField] public Sprite glideSprite { get; private set; }
 
     [Header("Jumping Stats")]
     [SerializeField, Range(2f, 5.5f)][Tooltip("Maximum jump height")] public float jumpHeight = 7.3f;
@@ -55,6 +59,7 @@ public class PlayerJump : MonoBehaviour
         // finds components, set variables, and makes a new instance of input
         ground = GetComponent<characterGround>();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         glideBar = transform.GetChild(0).transform.GetChild(0).GetComponent<Image>();
         playerActions = new PlayerInputActions();
         airCurrentsAffecting= new HashSet<GameObject>();
@@ -167,10 +172,12 @@ public class PlayerJump : MonoBehaviour
         if (!onGround && !ascendingFromJump && (inputGliding != 0) && (glideCounter > 0))
         {
             gliding = true;
+            sr.sprite = glideSprite;
         }
         else
         {
             gliding = false;
+            sr.sprite = walkSprite;
         }
     }
 
