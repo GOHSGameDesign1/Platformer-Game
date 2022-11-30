@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class AirCurrent : MonoBehaviour
@@ -40,10 +39,10 @@ public class AirCurrent : MonoBehaviour
 
         float particleVelocity = magnitude * 10;
 
-        main.startLifetime = Mathf.Clamp(transform.lossyScale.y / particleVelocity * 0.9f, 0.1f, 5f);
+        main.startLifetime = Mathf.Clamp((transform.lossyScale.y / particleVelocity) - 0.2f, 0.1f, 8f);
 
         velLifetime.y = particleVelocity;
-        velLifetime.orbitalZ = new ParticleSystem.MinMaxCurve((0.007f * magnitude), aniCurve);
+        //velLifetime.orbitalZ = new ParticleSystem.MinMaxCurve((0.007f * magnitude), aniCurve);
 
         shape.position = new Vector3(0, transform.lossyScale.y / -2 + 3, 0);
         shape.scale = new Vector3(transform.lossyScale.x, 6, 0);

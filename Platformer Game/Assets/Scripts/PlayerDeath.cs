@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerDeath : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class PlayerDeath : MonoBehaviour
             //if touching the spike portion of the spike platform, then die
             if (col.IsTouchingLayers(spikeLayer))
             {
-                Destroy(gameObject);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
     }
