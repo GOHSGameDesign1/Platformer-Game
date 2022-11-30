@@ -164,7 +164,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf05619b3e7d5e4785a3cfe0e9ca3df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 4.36
+  <walkSprite>k__BackingField: {fileID: 21300000, guid: ac14fcc40617f034698d704717a20c4a, type: 3}
+  <glideSprite>k__BackingField: {fileID: 21300000, guid: 8b992836443e1a743a6cf16a549340a3, type: 3}
+  jumpHeight: 5
   timeToJumpApex: 0.5
   upwardMovementMultiplier: 1
   downwardMovementMultiplier: 1.76

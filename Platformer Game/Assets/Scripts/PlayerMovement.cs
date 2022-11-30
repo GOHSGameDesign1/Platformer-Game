@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     characterGround ground;
     Rigidbody2D rb;
     PlayerJump playerJump;
+    SpriteRenderer sr;
 
     PlayerInputActions playerActions;
 
@@ -34,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     public bool onGround;
     public bool pressingKey;
     private HashSet<GameObject> currentAirCurrents;
+    public bool running;
 
 
     // Start is called before the first frame update
@@ -44,6 +46,8 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerJump= GetComponent<PlayerJump>();
         playerActions = new PlayerInputActions();
+        sr = GetComponent<SpriteRenderer>();
+        running = false;
     }
 
     private void Start()
@@ -70,10 +74,14 @@ public class PlayerMovement : MonoBehaviour
         if (directionX != 0)
         {
             //transform.localScale = new Vector3(directionX > 0 ? 1 : -1, 1, 1);
+            //transform.localScale = new Vector3(directionX > 0 ? 0.363895f : -0.363895f, 0.35261f, 1);
+            sr.flipX = directionX > 0 ? false : true;
+            running = ground.GetOnGround() ? true : false;
             pressingKey = true;
         }
         else
         {
+            running = false;
             pressingKey = false;
         }
 
