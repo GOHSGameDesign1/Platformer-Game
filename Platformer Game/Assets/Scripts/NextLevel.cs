@@ -10,6 +10,7 @@ public class NextLevel : MonoBehaviour
         if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings  - 1)
         {
             Debug.Log("Out of scenes");
+            SceneManager.LoadScene(0);
             return;
         }
 
