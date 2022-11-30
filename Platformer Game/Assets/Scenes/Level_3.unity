@@ -201,7 +201,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3392064726134429868, guid: 3ab5809a71d0712488ae8e545d70afd6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 262.75873
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 3392064726134429868, guid: 3ab5809a71d0712488ae8e545d70afd6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -483,6 +483,10 @@ PrefabInstance:
     - target: {fileID: 2156183469803126455, guid: 08e9b9d76535f664691a2c573d7a7875, type: 3}
       propertyPath: m_Name
       value: Air current
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156183471460677163, guid: 08e9b9d76535f664691a2c573d7a7875, type: 3}
+      propertyPath: TrailModule.colorOverTrail.maxColor.a
+      value: 0.59607846
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08e9b9d76535f664691a2c573d7a7875, type: 3}
